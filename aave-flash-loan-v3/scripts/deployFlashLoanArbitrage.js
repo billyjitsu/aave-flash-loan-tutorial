@@ -6,7 +6,7 @@ async function main() {
     "FlashLoanArbitrage"
   );
   const flashLoanArbitrage = await FlashLoanArbitrage.deploy(
-    "0xc4dCB5126a3AfEd129BC3668Ea19285A9f56D15D"
+    "0x012bAC54348C0E635dCAc9D5FB99f06F24136C9A"
   );
 
   await flashLoanArbitrage.deployed();

@@ -9,9 +9,9 @@ contract Dex {
 
     // Aave ERC20 Token addresses on Goerli network
     address private immutable daiAddress =
-        0xDF1742fE5b0bFc12331D8EAec6b478DfDbD31464;
+        0xFF34B3d4Aee8ddCd6F9AFFFB6Fe49bD371b8a357;
     address private immutable usdcAddress =
-        0xA2025B15a1757311bfD68cb14eaeFCc237AF5b43;
+        0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8;
 
     IERC20 private dai;
     IERC20 private usdc;
