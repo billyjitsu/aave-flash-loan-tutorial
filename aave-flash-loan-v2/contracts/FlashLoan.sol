@@ -8,10 +8,14 @@ import {ILendingPoolAddressesProvider} from "@aave/protocol-v2/contracts/interfa
 import {IERC20} from "@aave/protocol-v2/contracts/dependencies/openzeppelin/contracts/IERC20.sol";
 
 contract FlashLoan is FlashLoanReceiverBase {
+    address payable owner;
+
     constructor(address _addressProvider)
         public
         FlashLoanReceiverBase(ILendingPoolAddressesProvider(_addressProvider))
-    {}
+    {
+        owner = payable(msg.sender);
+    }
 
     /**
         This function is called after your contract has received the flash loaned amount
@@ -75,10 +79,9 @@ contract FlashLoan is FlashLoanReceiverBase {
     }
 
     function withdraw(address _tokenAddress) external onlyOwner {
-        IERC20(_tokenAddress).transfer(
-            msg.sender,
-            token.balanceOf(address(this))
-        );
+        IERC20 token = IERC20(_tokenAddress);
+        token.transfer(msg.sender, token.balanceOf(address(this)));
+    
     }
 
     modifier onlyOwner() {
