@@ -9,9 +9,9 @@ contract Dex {
 
     // Aave ERC20 Token addresses on Goerli network
     address private daiAddress =
-        0xFF34B3d4Aee8ddCd6F9AFFFB6Fe49bD371b8a357;
+        0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F;  // DAI on Mumbai Aave V2
     address private usdcAddress =
-        0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8;
+        0x2058A9D7613eEE744279e3856Ef0eAda5FCbaA7e;  // USDC on Mumbai Aave V2
 
     IERC20 private dai;
     IERC20 private usdc;
