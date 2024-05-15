@@ -8,7 +8,7 @@ import {ILendingPoolAddressesProvider} from "@aave/protocol-v2/contracts/interfa
 import {IERC20} from "@aave/protocol-v2/contracts/dependencies/openzeppelin/contracts/IERC20.sol";
 
 interface IDex {
-    function depositUSDC(uint256 _amount) external;
+    function depositUSDT(uint256 _amount) external;
 
     function depositDAI(uint256 _amount) external;
 
@@ -17,29 +17,29 @@ interface IDex {
     function sellDAI() external;
 }
 
-contract FlashLoan is FlashLoanReceiverBase {
+contract FlashLoanArbitrage is FlashLoanReceiverBase {
     address payable owner;
 
     // Aave ERC20 Token addresses on Mumbai network
     address private daiAddress =
-        0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F;
-    address private usdcAddress =
+        0x51BC2DfB9D12d9dB50C855A5330fBA0faF761D15;
+    address private usdtAddress =
         0x2058A9D7613eEE744279e3856Ef0eAda5FCbaA7e;
-    address private dexContractAddress =
-        0x99Ad46DE437750501c7FE335c1282445ba4BC73A;  // update to yours
+    address private dexContractAddress; // =
+        //0x99Ad46DE437750501c7FE335c1282445ba4BC73A;  // update to yours
 
     IERC20 private dai;
-    IERC20 private usdc;
+    IERC20 private usdt;
     IDex private dexContract;
 
-    constructor(address _addressProvider)
+    constructor(address _addressProvider, address _dexContractAddress)
         public
         FlashLoanReceiverBase(ILendingPoolAddressesProvider(_addressProvider))
     {
         owner = payable(msg.sender);
         dai = IERC20(daiAddress);
-        usdc = IERC20(usdcAddress);
-        dexContract = IDex(dexContractAddress);
+        usdt = IERC20(usdtAddress);
+        dexContract = IDex(_dexContractAddress);
     }
 
     /**
@@ -58,7 +58,7 @@ contract FlashLoan is FlashLoanReceiverBase {
         //
 
         // Arbirtage operation
-        dexContract.depositUSDC(1000000); // 1000 USDC
+        dexContract.depositUSDT(1000000); // 1000 usdt
         dexContract.buyDAI();
         dexContract.depositDAI(dai.balanceOf(address(this)));
         dexContract.sellDAI();
@@ -100,12 +100,12 @@ contract FlashLoan is FlashLoanReceiverBase {
         );
     }
 
-    function approveUSDC(uint256 _amount) external returns (bool) {
-        return usdc.approve(dexContractAddress, _amount);
+    function approveUSDT(uint256 _amount) external returns (bool) {
+        return usdt.approve(dexContractAddress, _amount);
     }
 
-    function allowanceUSDC() external view returns (uint256) {
-        return usdc.allowance(address(this), dexContractAddress);
+    function allowanceUSDT() external view returns (uint256) {
+        return usdt.allowance(address(this), dexContractAddress);
     }
 
     function approveDAI(uint256 _amount) external returns (bool) {
