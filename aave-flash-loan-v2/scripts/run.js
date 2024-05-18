@@ -6,8 +6,8 @@ async function main() {
     // Contract addresses
     const daiContractAddress = "0x6b175474e89094c44da98b954eedeac495271d0f";
     const usdcContractAddress = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
-    const dexContractAddress = "0x0967C1d49F3A48fc2b349756A3bDCD88fD3fA05F";
-    const flashLoanContractAddress = "0x0135E1CD8D7aC7333C4c2654328C891012b04349";
+    const dexContractAddress = "0x8176BC99C7e50617f9A89dAE1288e6a7e7732D2c";
+    const flashLoanContractAddress = "0x8F130Aac76683180BdbC2f3fa3FC31D499F45628";
 
   // const provider = process.env.RPC_ENDPOINT;
   const provider = new ethers.providers.JsonRpcProvider("https://rpc.tenderly.co/fork/1fbafd46-d3ad-4c4f-a6b6-a761ca5ecf1c");
@@ -28,6 +28,7 @@ async function main() {
     "function depositUSDC(uint256 amount) external",
     "function getBalance(address token) external view returns (uint256)",
     "function buyDAI() external",
+    "function previewDAISwap(uint256 amount) external view returns (uint256)",
     "function sellDAI() external",
     "function withdraw(address token) external"
   ];
@@ -50,25 +51,29 @@ async function main() {
   const dexContract = new hre.ethers.Contract(dexContractAddress, dexAbi, wallet);
   const flashLoanContract = new hre.ethers.Contract(flashLoanContractAddress, flashLoanAbi, wallet);
 
-  // console.log("Approving DAI and USDC for the Dex contract")
-  // // Set approval for the Dex contract to spend DAI and USDC
+  console.log("Approving DAI and USDC for the Dex contract")
+  // Set approval for the Dex contract to spend DAI and USDC
   const approveAmountDAI = hre.ethers.utils.parseUnits("10000", 18); 
-  // await daiContract.approve(dexContractAddress, approveAmountDAI);
+  await daiContract.approve(dexContractAddress, approveAmountDAI);
   const approveAmountUSDC = hre.ethers.utils.parseUnits("1000", 6);  // USDC has 6 decimals
-  // await usdcContract.approve(dexContractAddress, approveAmountUSDC);
+  await usdcContract.approve(dexContractAddress, approveAmountUSDC);
 
  
-  // console.log("Deposit DAI and USDC to the Dex contract to add liquidity")
-  // // Deposit DAI and USDC to the Dex contract
-  // await dexContract.depositDAI(approveAmountDAI);
-  // await dexContract.depositUSDC(approveAmountUSDC);
+  console.log("Deposit DAI and USDC to the Dex contract to add liquidity")
+  // Deposit DAI and USDC to the Dex contract
+  await dexContract.depositDAI(approveAmountDAI);
+  await dexContract.depositUSDC(approveAmountUSDC);
 
-  // console.log("Deposited DAI and USDC to the Dex contract");
+  console.log("Deposited DAI and USDC to the Dex contract");
+
+  // Preview the Dex swap gain
+  let daiReward = await dexContract.previewDAISwap(approveAmountUSDC);
+  console.log("DAI reward from the swap:", daiReward.toString());
 
   // Approve the Flash Loan contract to spend DAI and USDC from the Dex contract
   await flashLoanContract.approveUSDC(approveAmountUSDC);
   // Need to approve the value you get from the arbritrage to sell back - went larger to do this
-  await flashLoanContract.approveDAI(approveAmountDAI);
+  await flashLoanContract.approveDAI(daiReward);
 
   console.log("Approved Flash Loan contract to spend DAI and USDC from the Dex contract");
 
@@ -76,6 +81,10 @@ async function main() {
   await flashLoanContract.requestFlashLoan(usdcContractAddress, approveAmountUSDC);
 
   console.log("Requested a flash loan");
+
+  // Withdraw USDC Profit
+  await flashLoanContract.withdraw(usdcContractAddress);
+  console.log("Withdrawn USDC profit");
 }
 
 main().catch((error) => {

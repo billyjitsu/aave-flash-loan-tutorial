@@ -52,6 +52,10 @@ contract Dex {
         dai.transfer(msg.sender, daiToReceive);
     }
 
+    function previewDAISwap(uint256 _usdcAmount) external view returns (uint256) {
+        return ((_usdcAmount / dexARate) * 100) * (10**12);
+    }
+
     function sellDAI() external {
         uint256 usdcToReceive = ((daiBalances[msg.sender] * dexBRate) / 100) /
             (10**12);
