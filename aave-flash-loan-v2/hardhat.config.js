@@ -5,9 +5,11 @@ require("dotenv").config();
 module.exports = {
   solidity: "0.6.12",
   networks: {
-    goerli: {
-      url: process.env.INFURA_GOERLI_ENDPOINT,
+    tenderly: {
+      url: process.env.RPC_ENDPOINT,
       accounts: [process.env.PRIVATE_KEY],
+      gas: 200000000,
+      gasPrice: 100000000000,
     },
   },
 };

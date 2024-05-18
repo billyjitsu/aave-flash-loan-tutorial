@@ -9,12 +9,12 @@ contract Dex {
 
     // Aave ERC20 Token addresses on Goerli network
     address private daiAddress =
-        0x51BC2DfB9D12d9dB50C855A5330fBA0faF761D15;  // DAI on Ava Fuji Aave V2
-    address private usdtAddress =
-        0x2058A9D7613eEE744279e3856Ef0eAda5FCbaA7e;  // usdt on Ava Fuji Aave V2
+        0x6B175474E89094C44Da98b954EedeAC495271d0F;  // DAI on Forked mainnet
+    address private usdcAddress =
+        0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;  // usdc on Forked mainnet
 
     IERC20 private dai;
-    IERC20 private usdt;
+    IERC20 private usdc;
 
     // exchange rate indexes
     uint256 dexARate = 90;
@@ -23,20 +23,20 @@ contract Dex {
     // keeps track of individuals' dai balances
     mapping(address => uint256) public daiBalances;
 
-    // keeps track of individuals' usdt balances
-    mapping(address => uint256) public usdtBalances;
+    // keeps track of individuals' usdc balances
+    mapping(address => uint256) public usdcBalances;
 
     constructor() public {
         owner = payable(msg.sender);
         dai = IERC20(daiAddress);
-        usdt = IERC20(usdtAddress);
+        usdc = IERC20(usdcAddress);
     }
 
-    function depositUSDT(uint256 _amount) external {
-        usdtBalances[msg.sender] += _amount;
-        uint256 allowance = usdt.allowance(msg.sender, address(this));
+    function depositUSDC(uint256 _amount) external {
+        usdcBalances[msg.sender] += _amount;
+        uint256 allowance = usdc.allowance(msg.sender, address(this));
         require(allowance >= _amount, "Check the token allowance");
-        usdt.transferFrom(msg.sender, address(this), _amount);
+        usdc.transferFrom(msg.sender, address(this), _amount);
     }
 
     function depositDAI(uint256 _amount) external {
@@ -47,15 +47,15 @@ contract Dex {
     }
 
     function buyDAI() external {
-        uint256 daiToReceive = ((usdtBalances[msg.sender] / dexARate) * 100) *
+        uint256 daiToReceive = ((usdcBalances[msg.sender] / dexARate) * 100) *
             (10**12);
         dai.transfer(msg.sender, daiToReceive);
     }
 
     function sellDAI() external {
-        uint256 usdtToReceive = ((daiBalances[msg.sender] * dexBRate) / 100) /
+        uint256 usdcToReceive = ((daiBalances[msg.sender] * dexBRate) / 100) /
             (10**12);
-        usdt.transfer(msg.sender, usdtToReceive);
+        usdc.transfer(msg.sender, usdcToReceive);
     }
 
     function getBalance(address _tokenAddress) external view returns (uint256) {

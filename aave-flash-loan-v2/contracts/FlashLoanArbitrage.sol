@@ -8,7 +8,7 @@ import {ILendingPoolAddressesProvider} from "@aave/protocol-v2/contracts/interfa
 import {IERC20} from "@aave/protocol-v2/contracts/dependencies/openzeppelin/contracts/IERC20.sol";
 
 interface IDex {
-    function depositUSDT(uint256 _amount) external;
+    function depositUSDC(uint256 _amount) external;
 
     function depositDAI(uint256 _amount) external;
 
@@ -22,15 +22,16 @@ contract FlashLoanArbitrage is FlashLoanReceiverBase {
 
     // Aave ERC20 Token addresses on Mumbai network
     address private daiAddress =
-        0x51BC2DfB9D12d9dB50C855A5330fBA0faF761D15;
-    address private usdtAddress =
-        0x2058A9D7613eEE744279e3856Ef0eAda5FCbaA7e;
+        0x6B175474E89094C44Da98b954EedeAC495271d0F;
+    address private usdcAddress =
+        0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
     address private dexContractAddress; // =
         //0x99Ad46DE437750501c7FE335c1282445ba4BC73A;  // update to yours
 
     IERC20 private dai;
-    IERC20 private usdt;
+    IERC20 private usdc;
     IDex private dexContract;
+    uint256 public requestAmount;
 
     constructor(address _addressProvider, address _dexContractAddress)
         public
@@ -38,8 +39,9 @@ contract FlashLoanArbitrage is FlashLoanReceiverBase {
     {
         owner = payable(msg.sender);
         dai = IERC20(daiAddress);
-        usdt = IERC20(usdtAddress);
+        usdc = IERC20(usdcAddress);
         dexContract = IDex(_dexContractAddress);
+        dexContractAddress = _dexContractAddress;
     }
 
     /**
@@ -58,7 +60,7 @@ contract FlashLoanArbitrage is FlashLoanReceiverBase {
         //
 
         // Arbirtage operation
-        dexContract.depositUSDT(1000000); // 1000 usdt
+        dexContract.depositUSDC(requestAmount); 
         dexContract.buyDAI();
         dexContract.depositDAI(dai.balanceOf(address(this)));
         dexContract.sellDAI();
@@ -74,6 +76,7 @@ contract FlashLoanArbitrage is FlashLoanReceiverBase {
 
     function requestFlashLoan(address _token, uint256 _amount) public {
         address receiverAddress = address(this);
+        requestAmount = _amount;
 
         address[] memory assets = new address[](1);
         assets[0] = _token;
@@ -100,12 +103,12 @@ contract FlashLoanArbitrage is FlashLoanReceiverBase {
         );
     }
 
-    function approveUSDT(uint256 _amount) external returns (bool) {
-        return usdt.approve(dexContractAddress, _amount);
+    function approveUSDC(uint256 _amount) external returns (bool) {
+        return usdc.approve(dexContractAddress, _amount);
     }
 
-    function allowanceUSDT() external view returns (uint256) {
-        return usdt.allowance(address(this), dexContractAddress);
+    function allowanceUSDC() external view returns (uint256) {
+        return usdc.allowance(address(this), dexContractAddress);
     }
 
     function approveDAI(uint256 _amount) external returns (bool) {
