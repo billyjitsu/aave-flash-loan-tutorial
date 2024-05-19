@@ -17,14 +17,18 @@ https://docs.aave.com/developers/v/2.0/deployed-contracts/deployed-contracts
 #### (Forked Mainnet):
 - 0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5
 
+The Dex will alway have a profit in the swap when you swap USDC to DAI (10%) so when you do the flashloan the trade will always be beneficial and will have extra USDC to pay the Aave flashloan fee when the transation is completed.
 
 ### Suggested liquidity to add to Dex.sol:
-- USDC 1500
-- DAI  1500
+- USDC 10000
+- DAI  10000
 
 ### Approve:
 - USDC 1000000000
-- DAI  1200000000000000000000
+- DAI  1000000000000000000000
+
+### Note!:
+- When swapping USDC, your contract will try to sell the profited DAI which will be a higher amount.  You must check how much the profit will be to know how much to approve to swap the DAI back to the USDC. There is a function `previewDAISwap` that will let you preview the swap amount so you know the amount to approve for the flashloan contract for the dex.
 
 ## Request Loan - USDC (6 decimal):
 0xA2025B15a1757311bfD68cb14eaeFCc237AF5b43,1000000000 // 1,000 USDC
@@ -35,11 +39,12 @@ https://docs.aave.com/developers/v/2.0/deployed-contracts/deployed-contracts
 ## Steps
 
 - Step 1. Deploy your dex
-- Step 2. Make sure to add liquidity to your dex
-- Step 3. Deploy your flashloan contract
-- Step 3. Make sure approvals are set on Flashloan contract
-- Step 4. Request a loan for 1,000,000 USDT (hardcoded)
-- Step 5. See the results
+- Step 2. Approve DAI and USDC contracts to allow dex deposit
+- Step 3. Make sure to add liquidity to your dex
+- Step 4. Deploy your flashloan contract
+- Step 5. Approve DAI and USDC contracts to allow dex to swap from flashloan contract
+- Step 6. Request a loan for any amount in USDC
+- Step 7. See the profit after paying back flashloan
 
 
 
