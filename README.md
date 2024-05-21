@@ -36,15 +36,19 @@ The Dex will alway have a profit in the swap when you swap USDC to DAI (10%) so 
 
 ## FlashLoan test Only Steps
 
-## Steps
+## Testing just flashloan.sol contract
+- Step 1. Deploy your flashloan contract
+- Step 2. Fund you flashloan contract with some USDC (need to pay back the Flashloan fee)
+- Step 3. Request a loan for any amount of USDC (start with a 1 dollar to make sure it works)
+
+## Steps to perform Arbitrage
 
 - Step 1. Deploy your dex
-- Step 2. Approve DAI and USDC contracts to allow dex deposit
-- Step 3. Make sure to add liquidity to your dex
-- Step 4. Deploy your flashloan contract
-- Step 5. Approve DAI and USDC contracts to allow dex to swap from flashloan contract
-- Step 6. Request a loan for any amount in USDC
-- Step 7. See the profit after paying back flashloan
+- Step 2. Make sure to add liquidity to your dex (DAI and USDC)
+- Step 3. Deploy your flashloan contract
+- Step 3. Make sure approvals are set on Flashloan contract
+- Step 4. Request a loan for any amount of USDC (not more than your liquidity)
+- Step 5. See the results
 
 
 
