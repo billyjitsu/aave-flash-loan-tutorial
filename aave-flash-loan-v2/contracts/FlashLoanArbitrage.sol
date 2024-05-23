@@ -20,13 +20,11 @@ interface IDex {
 contract FlashLoanArbitrage is FlashLoanReceiverBase {
     address payable owner;
 
-    // Aave ERC20 Token addresses on Mumbai network
     address private daiAddress =
         0x6B175474E89094C44Da98b954EedeAC495271d0F;
     address private usdcAddress =
         0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
-    address private dexContractAddress; // =
-        //0x99Ad46DE437750501c7FE335c1282445ba4BC73A;  // update to yours
+    address private dexContractAddress;
 
     IERC20 private dai;
     IERC20 private usdc;

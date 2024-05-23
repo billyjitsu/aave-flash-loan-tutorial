@@ -5,8 +5,8 @@ require("dotenv").config();
 module.exports = {
   solidity: "0.8.10",
   networks: {
-    sepolia: {
-      url: process.env.INFURA_GOERLI_ENDPOINT,
+    tenderly: {
+      url: process.env.RPC_ENDPOINT,
       accounts: [process.env.PRIVATE_KEY],
     },
   },

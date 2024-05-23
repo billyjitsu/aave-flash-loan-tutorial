@@ -19,26 +19,26 @@ interface IDex {
 contract FlashLoanArbitrage is FlashLoanSimpleReceiverBase {
     address payable owner;
 
-    // Aave ERC20 Token addresses on Goerli network
-    address private immutable daiAddress =
-        0xFF34B3d4Aee8ddCd6F9AFFFB6Fe49bD371b8a357;
-    address private immutable usdcAddress =
-        0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8;
-    address private dexContractAddress =
-        0x4ef5c49cEf27DD3E9433C58759cb5397c982DB30;
+    address private daiAddress =
+        0x6B175474E89094C44Da98b954EedeAC495271d0F;
+    address private usdcAddress =
+        0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
+    address private dexContractAddress;
 
     IERC20 private dai;
     IERC20 private usdc;
     IDex private dexContract;
+    uint256 public requestAmount;
 
-    constructor(address _addressProvider)
+    constructor(address _addressProvider, address _dexContractAddress)
         FlashLoanSimpleReceiverBase(IPoolAddressesProvider(_addressProvider))
     {
         owner = payable(msg.sender);
 
         dai = IERC20(daiAddress);
         usdc = IERC20(usdcAddress);
-        dexContract = IDex(dexContractAddress);
+        dexContract = IDex(_dexContractAddress);
+        dexContractAddress = _dexContractAddress;
     }
 
     /**
@@ -57,7 +57,7 @@ contract FlashLoanArbitrage is FlashLoanSimpleReceiverBase {
         //
 
         // Arbirtage operation
-        dexContract.depositUSDC(10000000000); // 1000 USDC
+        dexContract.depositUSDC(requestAmount); // 1000 USDC
         dexContract.buyDAI();
         dexContract.depositDAI(dai.balanceOf(address(this)));
         dexContract.sellDAI();
@@ -76,6 +76,8 @@ contract FlashLoanArbitrage is FlashLoanSimpleReceiverBase {
 
     function requestFlashLoan(address _token, uint256 _amount) public {
         address receiverAddress = address(this);
+        requestAmount = _amount;
+        
         address asset = _token;
         uint256 amount = _amount;
         bytes memory params = "";

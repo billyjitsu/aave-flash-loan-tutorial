@@ -73,9 +73,9 @@ async function main() {
   console.log("Approving DAI and USDC for the Dex contract");
   // Set approval for the Dex contract to spend DAI and USDC
   // We must approve the Dex contract to spend DAI and USDC from our wallet
-  const approveAmountDAI = hre.ethers.utils.parseUnits("1000", 18);
+  const approveAmountDAI = hre.ethers.utils.parseUnits("1000000", 18);
   await daiContract.approve(dexContractAddress, approveAmountDAI);
-  const approveAmountUSDC = hre.ethers.utils.parseUnits("1000", 6); // USDC has 6 decimals
+  const approveAmountUSDC = hre.ethers.utils.parseUnits("1000000", 6); // USDC has 6 decimals
   await usdcContract.approve(dexContractAddress, approveAmountUSDC);
 
   console.log("Deposit DAI and USDC to the Dex contract to add liquidity");
@@ -101,10 +101,11 @@ async function main() {
     "Approved Flash Loan contract to spend DAI and USDC from the Dex contract"
   );
 
+  const requestAmountUSDC = hre.ethers.utils.parseUnits("100000", 6);
   // Request a flash loan from the Flash Loan contract
   await flashLoanContract.requestFlashLoan(
     usdcContractAddress,
-    approveAmountUSDC
+    requestAmountUSDC
   );
   console.log("Requested a flash loan");
 

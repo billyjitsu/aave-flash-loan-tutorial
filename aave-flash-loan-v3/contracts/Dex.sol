@@ -8,10 +8,10 @@ contract Dex {
     address payable public owner;
 
     // Aave ERC20 Token addresses on Goerli network
-    address private immutable daiAddress =
-        0xFF34B3d4Aee8ddCd6F9AFFFB6Fe49bD371b8a357;
-    address private immutable usdcAddress =
-        0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8;
+    address private daiAddress =
+        0x6B175474E89094C44Da98b954EedeAC495271d0F;  // DAI on Forked mainnet
+    address private usdcAddress =
+        0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;  // usdc on Forked mainnet
 
     IERC20 private dai;
     IERC20 private usdc;
@@ -50,6 +50,10 @@ contract Dex {
         uint256 daiToReceive = ((usdcBalances[msg.sender] / dexARate) * 100) *
             (10**12);
         dai.transfer(msg.sender, daiToReceive);
+    }
+
+    function previewDAISwap(uint256 _usdcAmount) external view returns (uint256) {
+        return ((_usdcAmount / dexARate) * 100) * (10**12);
     }
 
     function sellDAI() external {
