@@ -11,7 +11,7 @@ interface IGenericDex {
     function getBalance(address _token) external view returns (uint256);
 }
 
-contract FlashLoanWithDex is FlashLoanReceiverBase {
+contract FlashLoanLiquidationSwap is FlashLoanReceiverBase {
     address payable public owner;
     IGenericDex public dex;
 
@@ -32,30 +32,38 @@ contract FlashLoanWithDex is FlashLoanReceiverBase {
     ) external override returns (bool) {
         require(assets.length == 1, "This contract expects one asset");
         
-        // Decode the params to get the target token address
-        address targetToken = abi.decode(params, (address));
+        // Decode the params to get the token received from liquidation
+        address tokenReceivedFromLiquidation = abi.decode(params, (address));
 
-        // Perform the swap on the DEX
-        IERC20(assets[0]).approve(address(dex), amounts[0]);
-        dex.swap(assets[0], targetToken, amounts[0]);
+        uint256 flashLoanAmount = amounts[0];
+        uint256 premium = premiums[0];
 
-        // Swap back to repay the flash loan
-        uint256 swappedAmount = IERC20(targetToken).balanceOf(address(this));
-        IERC20(targetToken).approve(address(dex), swappedAmount);
-        dex.swap(targetToken, assets[0], swappedAmount);
+        // Here you would typically perform the liquidation
+        // For this example, we'll simulate it with a DEX swap
+        IERC20(assets[0]).approve(address(dex), flashLoanAmount);
+        dex.swap(assets[0], tokenReceivedFromLiquidation, flashLoanAmount);
+
+        // Swap the token received from liquidation back to the flash-loaned token
+        uint256 liquidationTokenBalance = IERC20(tokenReceivedFromLiquidation).balanceOf(address(this));
+        IERC20(tokenReceivedFromLiquidation).approve(address(dex), liquidationTokenBalance);
+        dex.swap(tokenReceivedFromLiquidation, assets[0], liquidationTokenBalance);
+
+        // Ensure we have enough to repay the loan
+        uint256 amountOwing = flashLoanAmount.add(premium);
+        uint256 finalBalance = IERC20(assets[0]).balanceOf(address(this));
+        require(finalBalance >= amountOwing, "Not enough tokens to repay the loan");
 
         // Approve the LendingPool contract allowance to pull the owed amount
-        uint256 amountOwing = amounts[0].add(premiums[0]);
         IERC20(assets[0]).approve(address(LENDING_POOL), amountOwing);
 
         return true;
     }
-                            // the token we want to pay back                    // the token we want to receive
-    function requestFlashLoan(address _assetToFlashLoan, uint256 _amount, address _targetToken) external onlyOwner {
+
+    function requestFlashLoan(address _flashAsset, uint256 _amount, address _tokenReceivedFromLiquidation) external onlyOwner {
         address receiverAddress = address(this);
 
         address[] memory assets = new address[](1);
-        assets[0] = _assetToFlashLoan;
+        assets[0] = _flashAsset;
 
         uint256[] memory amounts = new uint256[](1);
         amounts[0] = _amount;
@@ -65,7 +73,7 @@ contract FlashLoanWithDex is FlashLoanReceiverBase {
         modes[0] = 0;
 
         address onBehalfOf = address(this);
-        bytes memory params = abi.encode(_targetToken);
+        bytes memory params = abi.encode(_tokenReceivedFromLiquidation);
         uint16 referralCode = 0;
 
         LENDING_POOL.flashLoan(

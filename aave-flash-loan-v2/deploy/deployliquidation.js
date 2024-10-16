@@ -12,7 +12,7 @@ async function main() {
 
  console.log("Dex contract deployed: ", dex.address);
 
-  const FlashLoan = await hre.ethers.getContractFactory("FlashLoanWithDex");
+  const FlashLoan = await hre.ethers.getContractFactory("FlashLoanLiquidationSwapx");
   const flashLoan = await FlashLoan.deploy(
     aaveLendingPoolAddressProvider,
     dex.address
