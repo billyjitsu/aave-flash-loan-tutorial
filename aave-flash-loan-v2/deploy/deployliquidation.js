@@ -4,9 +4,9 @@ async function main() {
   console.log("deploying...");
 
   const aaveLendingPoolAddressProvider =
-    "0xdaF4ae8917F17de67F3D0E1D5568FA997ed67f09"; // Mainnet address (forked)
+    "0xdaF4ae8917F17de67F3D0E1D5568FA997ed67f09"; // my deployed arbtirum lending pool address provider
 
-  const Dex = await hre.ethers.getContractFactory("Dex");
+  const Dex = await hre.ethers.getContractFactory("GenericDex");
   const dex = await Dex.deploy();
   await dex.deployed();
 
