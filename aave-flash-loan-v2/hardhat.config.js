@@ -11,5 +11,11 @@ module.exports = {
       gas: 200000000,
       gasPrice: 100000000000,
     },
+    arbitrumSepolia: {
+      url: process.env.RPC_ENDPOINT,
+      accounts: {mnemonic: process.env.MNEMONIC},
+      // gas: 200000000,
+      // gasPrice: 100000000000,
+    },
   },
 };

@@ -32,58 +32,54 @@ contract FlashLoanLiquidationSwap is FlashLoanReceiverBase {
     ) external override returns (bool) {
         require(assets.length == 1, "This contract expects one asset");
         
-        // Decode the params to get the token received from liquidation
         address tokenReceivedFromLiquidation = abi.decode(params, (address));
 
-        uint256 flashLoanAmount = amounts[0];
-        uint256 premium = premiums[0];
-
-        // Here you would typically perform the liquidation
-        // For this example, we'll simulate it with a DEX swap
-        IERC20(assets[0]).approve(address(dex), flashLoanAmount);
-        dex.swap(assets[0], tokenReceivedFromLiquidation, flashLoanAmount);
-
-        // Swap the token received from liquidation back to the flash-loaned token
-        uint256 liquidationTokenBalance = IERC20(tokenReceivedFromLiquidation).balanceOf(address(this));
-        IERC20(tokenReceivedFromLiquidation).approve(address(dex), liquidationTokenBalance);
-        dex.swap(tokenReceivedFromLiquidation, assets[0], liquidationTokenBalance);
-
-        // Ensure we have enough to repay the loan
-        uint256 amountOwing = flashLoanAmount.add(premium);
-        uint256 finalBalance = IERC20(assets[0]).balanceOf(address(this));
-        require(finalBalance >= amountOwing, "Not enough tokens to repay the loan");
-
-        // Approve the LendingPool contract allowance to pull the owed amount
+        performLiquidationAndSwap(assets[0], amounts[0], tokenReceivedFromLiquidation);
+        
+        uint256 amountOwing = amounts[0] + premiums[0];
         IERC20(assets[0]).approve(address(LENDING_POOL), amountOwing);
 
         return true;
     }
 
+    function performLiquidationAndSwap(
+        address flashLoanAsset, 
+        uint256 flashLoanAmount,
+        address tokenReceivedFromLiquidation
+    ) internal {
+        // Simulate liquidation with a swap
+        IERC20(flashLoanAsset).approve(address(dex), flashLoanAmount);
+        dex.swap(flashLoanAsset, tokenReceivedFromLiquidation, flashLoanAmount);
+
+        // Swap back to repay the flash loan
+        uint256 liquidationTokenBalance = IERC20(tokenReceivedFromLiquidation).balanceOf(address(this));
+        IERC20(tokenReceivedFromLiquidation).approve(address(dex), liquidationTokenBalance);
+        dex.swap(tokenReceivedFromLiquidation, flashLoanAsset, liquidationTokenBalance);
+
+        // Ensure we have enough to repay the loan
+        uint256 finalBalance = IERC20(flashLoanAsset).balanceOf(address(this));
+        require(finalBalance >= flashLoanAmount, "Not enough tokens to repay the loan");
+    }
+
     function requestFlashLoan(address _flashAsset, uint256 _amount, address _tokenReceivedFromLiquidation) external onlyOwner {
         address receiverAddress = address(this);
-
         address[] memory assets = new address[](1);
         assets[0] = _flashAsset;
-
         uint256[] memory amounts = new uint256[](1);
         amounts[0] = _amount;
-
-        // 0 = no debt, 1 = stable, 2 = variable
         uint256[] memory modes = new uint256[](1);
         modes[0] = 0;
 
-        address onBehalfOf = address(this);
         bytes memory params = abi.encode(_tokenReceivedFromLiquidation);
-        uint16 referralCode = 0;
 
         LENDING_POOL.flashLoan(
             receiverAddress,
             assets,
             amounts,
             modes,
-            onBehalfOf,
+            address(this),
             params,
-            referralCode
+            0
         );
     }
 
@@ -97,10 +93,7 @@ contract FlashLoanLiquidationSwap is FlashLoanReceiverBase {
     }
 
     modifier onlyOwner() {
-        require(
-            msg.sender == owner,
-            "Only the contract owner can call this function"
-        );
+        require(msg.sender == owner, "Only the contract owner can call this function");
         _;
     }
 
