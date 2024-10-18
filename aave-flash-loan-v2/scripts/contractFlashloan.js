@@ -3,8 +3,8 @@ require('dotenv').config();
 
 // Contract addresses (replace with actual addresses)
 const lendingPoolAddressesProviderAddress = "0xdaF4ae8917F17de67F3D0E1D5568FA997ed67f09";
-const protocolDataProviderAddress = "0xF3595F8eA816bb2426D1deF56b070C2d2f86DBAB"; // Add this
-const flashLoanLiquidationSwapAddress = "0xFda3B0Fc3689237059506e589294335a90F17fB5";
+const protocolDataProviderAddress = "0xF3595F8eA816bb2426D1deF56b070C2d2f86DBAB"; 
+const flashLoanLiquidationSwapAddress = "0x46c6284B4b1C17F25B7957e77445dbf029A0Ed60";
 
 const mnemonic = process.env.MNEMONIC;
 const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_ENDPOINT);

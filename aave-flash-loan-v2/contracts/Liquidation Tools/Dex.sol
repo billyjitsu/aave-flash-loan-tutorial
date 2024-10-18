@@ -70,7 +70,7 @@ contract GenericDex {
 
     function deposit(address _token, uint256 _amount) external {
         require(_amount > 0, "Deposit amount must be greater than 0");
-        tokenBalances[msg.sender][_token] = tokenBalances[msg.sender][_token].add(_amount);
+        tokenBalances[address(this)][_token] = tokenBalances[address(this)][_token].add(_amount);
         IERC20(_token).transferFrom(msg.sender, address(this), _amount);
     }
 

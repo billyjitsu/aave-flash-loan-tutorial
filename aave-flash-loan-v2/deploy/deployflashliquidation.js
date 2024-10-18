@@ -6,20 +6,20 @@ async function main() {
 
   const aaveLendingPoolAddressProvider =
     "0xdaF4ae8917F17de67F3D0E1D5568FA997ed67f09"; // lendingpool from scripts
-  const dexAddress = "0xA2B650236734DE65DaBd7b4EE6292fd8A4908aBF";
+  // const dexAddress = "0xA2B650236734DE65DaBd7b4EE6292fd8A4908aBF";
 
-  //   const Dex = await hre.ethers.getContractFactory("GenericDex");
-  //   const dex = await Dex.deploy();
-  //   await dex.deployed();
+    const Dex = await hre.ethers.getContractFactory("GenericDex");
+    const dex = await Dex.deploy();
+    await dex.deployed();
 
-  //   console.log("Dex contract deployed: ", dex.address);
+    console.log("Dex contract deployed: ", dex.address);
 
   const FlashLoan = await hre.ethers.getContractFactory(
     "FlashLoanLiquidationSwap"
   );
   const flashLoan = await FlashLoan.deploy(
     aaveLendingPoolAddressProvider,
-    dexAddress
+    dex.address
   );
 
   await flashLoan.deployed();
@@ -28,6 +28,7 @@ async function main() {
 
   // Create an object with the deployed addresses
   const deployedAddresses = {
+    DexAddress: dex.address,
     FlashLoanAddress: flashLoan.address,
   };
 

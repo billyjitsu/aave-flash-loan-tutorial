@@ -41,10 +41,10 @@ async function main() {
     console.log(`USDC decimals: ${usdcDecimals}, API3 decimals: ${api3Decimals}`);
 
     // Amount to borrow (e.g., 1000 USDC)
-    const borrowAmount = ethers.utils.parseUnits("1", usdcDecimals);
+    const borrowAmount = ethers.utils.parseUnits("9000", usdcDecimals);
 
     // Amount of API3 to supply (should be equivalent to borrowed USDC plus some extra for fees)
-    const api3Amount = ethers.utils.parseUnits("11", api3Decimals); // Adjust this amount as needed
+    const api3Amount = ethers.utils.parseUnits("9000", api3Decimals); // Adjust this amount as needed
 
     try {
         // Supply API3 tokens to the flash loan contract

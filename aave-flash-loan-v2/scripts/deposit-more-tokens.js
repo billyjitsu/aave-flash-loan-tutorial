@@ -2,7 +2,7 @@ const ethers = require('ethers');
 require('dotenv').config();
 
 // Contract addresses (replace with actual addresses)
-const dexAddress = "0xA2B650236734DE65DaBd7b4EE6292fd8A4908aBF";
+const dexAddress = "0xfa79f9606Ffac328CfA0Db7Ac8b07193d31d4915";
 const tokenAAddress = "0xc9948c82b422f78f6F02C151409fCAd7659269C7"; //API3 token
 const tokenBAddress = "0xf54942A576A938FD63Bf9125Ad741DacC555CB6A"; //USDC token
 
