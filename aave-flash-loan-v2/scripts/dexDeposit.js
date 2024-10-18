@@ -7,8 +7,8 @@ const tokenAAddress = "0xc9948c82b422f78f6F02C151409fCAd7659269C7"; //API3 token
 const tokenBAddress = "0xf54942A576A938FD63Bf9125Ad741DacC555CB6A"; //USDC token
 // const tokenAAddress = "0x0b38210ea11411557c13457d4da7dc6ea731b88a"; //API3 token mainnet
 // const tokenBAddress = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"; //USDC token mainnet
-const amountOfTokenA = "100";
-const amountOfTokenB = "100";
+const amountOfTokenA = "100000";
+const amountOfTokenB = "100000";
 
 // ABI for the GenericDex contract (you'll need to replace this with the actual ABI)
 const dexABI = [

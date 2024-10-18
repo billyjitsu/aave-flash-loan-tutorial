@@ -11,9 +11,14 @@ interface IGenericDex {
     function getBalance(address _token) external view returns (uint256);
 }
 
-contract FlashLoanDex is FlashLoanReceiverBase {
+contract FlashLoanLiquidationSwap is FlashLoanReceiverBase {
     address payable public owner;
     IGenericDex public dex;
+
+    struct LiquidationParams {
+        address collateralAsset;
+        address borrower;
+    }
 
     constructor(address _addressProvider, address _dexAddress)
         public
@@ -32,9 +37,10 @@ contract FlashLoanDex is FlashLoanReceiverBase {
     ) external override returns (bool) {
         require(assets.length == 1, "This contract expects one asset");
         
-        address tokenReceivedFromLiquidation = abi.decode(params, (address));
+        (address collateralAsset, address borrower) = abi.decode(params, (address, address));
+        LiquidationParams memory liquidationParams = LiquidationParams(collateralAsset, borrower);
 
-        performLiquidationAndSwap(assets[0], amounts[0], tokenReceivedFromLiquidation);
+        performLiquidationAndSwap(assets[0], amounts[0], liquidationParams);
         
         uint256 amountOwing = amounts[0] + premiums[0];
         IERC20(assets[0]).approve(address(LENDING_POOL), amountOwing);
@@ -43,34 +49,54 @@ contract FlashLoanDex is FlashLoanReceiverBase {
     }
 
     function performLiquidationAndSwap(
-        address flashLoanAsset, 
-        uint256 flashLoanAmount,
-        address tokenReceivedFromLiquidation
+        address debtAsset,
+        uint256 debtAmount,
+        LiquidationParams memory params
     ) internal {
-        // Simulate liquidation with a swap
-        IERC20(flashLoanAsset).approve(address(dex), flashLoanAmount);
-        dex.swap(flashLoanAsset, tokenReceivedFromLiquidation, flashLoanAmount);
+        // Approve the LendingPool to use the flash loaned amount
+        IERC20(debtAsset).approve(address(LENDING_POOL), debtAmount);
 
-        // Swap back to repay the flash loan
-        uint256 liquidationTokenBalance = IERC20(tokenReceivedFromLiquidation).balanceOf(address(this));
-        IERC20(tokenReceivedFromLiquidation).approve(address(dex), liquidationTokenBalance);
-        dex.swap(tokenReceivedFromLiquidation, flashLoanAsset, liquidationTokenBalance);
+        // Get the initial balance of collateral asset
+        uint256 initialCollateralBalance = IERC20(params.collateralAsset).balanceOf(address(this));
+
+        // Perform the liquidation
+        LENDING_POOL.liquidationCall(
+            params.collateralAsset,
+            debtAsset,
+            params.borrower,
+            debtAmount,
+            false  // receive aToken false
+        );
+
+        // Calculate the liquidated collateral amount
+        uint256 liquidatedCollateralAmount = IERC20(params.collateralAsset).balanceOf(address(this)) - initialCollateralBalance;
+
+        // Swap the received collateral back to the debt asset
+        if (liquidatedCollateralAmount > 0) {
+            IERC20(params.collateralAsset).approve(address(dex), liquidatedCollateralAmount);
+            dex.swap(params.collateralAsset, debtAsset, liquidatedCollateralAmount);
+        }
 
         // Ensure we have enough to repay the loan
-        uint256 finalBalance = IERC20(flashLoanAsset).balanceOf(address(this));
-        require(finalBalance >= flashLoanAmount, "Not enough tokens to repay the loan");
+        uint256 finalBalance = IERC20(debtAsset).balanceOf(address(this));
+        require(finalBalance >= debtAmount, "Not enough tokens to repay the loan");
     }
 
-    function requestFlashLoan(address _flashAsset, uint256 _amount, address _tokenReceivedFromLiquidation) external onlyOwner {
+    function requestFlashLoanAndLiquidate(
+        address _debtAsset, 
+        uint256 _debtAmount, 
+        address _collateralAsset,
+        address _borrower
+    ) external onlyOwner {
         address receiverAddress = address(this);
         address[] memory assets = new address[](1);
-        assets[0] = _flashAsset;
+        assets[0] = _debtAsset;
         uint256[] memory amounts = new uint256[](1);
-        amounts[0] = _amount;
+        amounts[0] = _debtAmount;
         uint256[] memory modes = new uint256[](1);
         modes[0] = 0;
 
-        bytes memory params = abi.encode(_tokenReceivedFromLiquidation);
+        bytes memory params = abi.encode(_collateralAsset, _borrower);
 
         LENDING_POOL.flashLoan(
             receiverAddress,
