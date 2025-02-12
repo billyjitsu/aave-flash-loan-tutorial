@@ -3,7 +3,7 @@ Create an Aave Flash Loan arbitrage smart contract demonstrating both v2 and v3 
 
 # Aave v2 Flash Loan Information:
 https://docs.aave.com/developers/v/2.0/guides/flash-loans
-https://docs.aave.com/developers/v/2.0/deployed-contracts/deployed-contracts
+https://aave.com/docs/resources/addresses
 
 #### Because of the deprecation of Mumbai and Fuji we fork mainnet to test out V2
 

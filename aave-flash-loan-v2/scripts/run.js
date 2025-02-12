@@ -5,11 +5,11 @@ async function main() {
   // Contract addresses
   const daiContractAddress = "0x6b175474e89094c44da98b954eedeac495271d0f"; // DAI forked from mainnet
   const usdcContractAddress = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"; // USDC forked from mainnet
-  const dexContractAddress = "0x8176BC99C7e50617f9A89dAE1288e6a7e7732D2c"; // Dex contract deployed on the forked network
-  const flashLoanContractAddress = "0x8F130Aac76683180BdbC2f3fa3FC31D499F45628"; // Flash Loan contract deployed on the forked network
+  const dexContractAddress = "0xB379db9378f363F47A9255087679238144F49997"; // Dex contract deployed on the forked network
+  const flashLoanContractAddress = "0x4012384B06152be21E490C544c43b37F35e518F0"; // Flash Loan contract deployed on the forked network
 
   const provider = new ethers.providers.JsonRpcProvider(
-    "https://rpc.tenderly.co/fork/1fbafd46-d3ad-4c4f-a6b6-a761ca5ecf1c"
+    process.env.RPC_ENDPOINT
   );
   const privateKey = process.env.PRIVATE_KEY;
   const wallet = new hre.ethers.Wallet(privateKey, provider);

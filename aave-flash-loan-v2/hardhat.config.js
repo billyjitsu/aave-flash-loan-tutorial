@@ -8,8 +8,8 @@ module.exports = {
     tenderly: {
       url: process.env.RPC_ENDPOINT,
       accounts: [process.env.PRIVATE_KEY],
-      gas: 200000000,
-      gasPrice: 100000000000,
+      // gas: 200000000,
+      // gasPrice: 100000000000,
     },
   },
 };
