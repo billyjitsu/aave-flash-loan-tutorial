@@ -1,20 +1,28 @@
 const hre = require("hardhat");
 require("dotenv").config();
+const path = require('path');
+const fs = require('fs');
 
 async function main() {
+  // Read deployed contract addresses from JSON file
+  const deployedContracts = JSON.parse(
+    fs.readFileSync(
+      path.join(__dirname, '..', 'deployed-contracts.json'),
+      'utf8'
+    )
+  );
+
   // Contract addresses
   const daiContractAddress = "0x6b175474e89094c44da98b954eedeac495271d0f"; // DAI forked from mainnet
   const usdcContractAddress = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"; // USDC forked from mainnet
-  const dexContractAddress = "0xB379db9378f363F47A9255087679238144F49997"; // Dex contract deployed on the forked network
-  const flashLoanContractAddress = "0x4012384B06152be21E490C544c43b37F35e518F0"; // Flash Loan contract deployed on the forked network
+  const dexContractAddress = deployedContracts.dex; // Read from deployed-contracts.json
+  const flashLoanContractAddress = deployedContracts.flashLoanArbitrage; // Read from deployed-contracts.json
 
   const provider = new ethers.providers.JsonRpcProvider(
     process.env.RPC_ENDPOINT
   );
   const privateKey = process.env.PRIVATE_KEY;
   const wallet = new hre.ethers.Wallet(privateKey, provider);
-
-  // console.log("Wallet address:", wallet.address);
 
   // ABI for ERC20 token (DAI and USDC)
   const erc20Abi = [

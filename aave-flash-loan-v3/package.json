@@ -1,5 +1,10 @@
 {
   "name": "hardhat-project",
+  "scripts": {
+    "deploy": "npx hardhat run deploy/deploy.js  --network tenderly",
+    "flashloan": "npx hardhat run scripts/flashloan.js",
+    "flashloanArb": "npx hardhat run scripts/flashloanArb.js"
+  },
   "devDependencies": {
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/providers": "^5.7.1",

@@ -2,7 +2,6 @@
 Create an Aave Flash Loan arbitrage smart contract demonstrating both v2 and v3 versions.  
 
 # Aave v2 Flash Loan Information:
-https://docs.aave.com/developers/v/2.0/guides/flash-loans
 https://aave.com/docs/resources/addresses
 
 #### Because of the deprecation of Mumbai and Fuji we fork mainnet to test out V2
@@ -55,18 +54,18 @@ The Dex will alway have a profit in the swap when you swap USDC to DAI (10%) so 
 
 
 # Aave v3 Flash Loan Information:
-https://docs.aave.com/developers/guides/flash-loans
-https://docs.aave.com/developers/deployed-contracts/v3-testnet-addresses
+https://aave.com/docs/developers/flash-loans
+https://aave.com/docs/resources/addresses
 
 You can mint tokens from Aave via sepolia testnet 
 https://app.aave.com/faucet/
 
 
 ## DAI  (ETH Forked Mainnet):
-0xFF34B3d4Aee8ddCd6F9AFFFB6Fe49bD371b8a357
+0x6B175474E89094C44Da98b954EedeAC495271d0F
 
 ## USDC  (ETH Forked Mainnet):
-0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8
+0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48
 
 ## AAVE PoolAddressProvider (Forked Mainnet)
 0x2f39d218133AFaB8F2B819B1066c7E434Ad94E9e
