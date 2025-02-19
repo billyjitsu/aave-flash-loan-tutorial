@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "generateWallet": "node generateWallet.js"
+  },
   "devDependencies": {
     "ethers": "5.7.1"
   }
